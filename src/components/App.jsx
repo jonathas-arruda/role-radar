@@ -1,3 +1,4 @@
+import { MapMarker } from '@primeicons/react/map-marker';
 import './../styles.css';
 
 function App() {
@@ -8,13 +9,14 @@ function App() {
     marginTop: '10px'
   };
 
-  const obterAno = () => {
-    return new Date().getFullYear();
-  };
+  const obterAno = () => new Date().getFullYear();
 
   return (
     <>
-      <h1 className="titulo">RolêRadar</h1>
+      <h1 className="titulo">
+        <MapMarker/>
+        RolêRadar
+      </h1>
       <p style={estiloSubtitulo}>Descubra o que existe perto de você</p>
       <footer>RolêRadar © {obterAno()}</footer>
     </>
