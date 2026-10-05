@@ -1,5 +1,7 @@
 import { MapMarker } from '@primeicons/react/map-marker';
 import './../styles.css';
+import Cartao from './Cartao';
+import Creditos from './Creditos';
 
 function App() {
   const estiloSubtitulo = {
@@ -18,6 +20,10 @@ function App() {
         RolêRadar
       </h1>
       <p style={estiloSubtitulo}>Descubra o que existe perto de você</p>
+      <Creditos/>
+       <Cartao cabecalho="Teste">
+        <p>Conteúdo do cartão</p>
+      </Cartao>
       <footer>RolêRadar © {obterAno()}</footer>
     </>
   );
