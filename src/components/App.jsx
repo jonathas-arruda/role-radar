@@ -4,6 +4,7 @@ import './../styles.css';
 import Cartao from './Cartao';
 import Creditos from './Creditos';
 import Loading from './Loading';
+import MeuPonto from './MeuPonto';
 
 
 class App extends Component {
@@ -59,10 +60,16 @@ class App extends Component {
         {this.state.mensagemDeErro ? (
           <p>{this.state.mensagemDeErro}</p>
         ) : !this.state.latitude ? (
-          
           <Loading mensagem="Aguardando permissão de localização..." />
         ) : (
-          <p>Localização obtida</p>
+          <Cartao cabecalho="Você está aqui">
+            <MeuPonto
+              latitude={this.state.latitude}
+              longitude={this.state.longitude}
+              horarioLocalizacao={this.state.horarioLocalizacao}
+              onAtualizar={this.obterLocalizacao}
+            />
+          </Cartao>
         )}
         <footer>RolêRadar © {this.obterAno()}</footer>
       </>
