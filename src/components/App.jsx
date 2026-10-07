@@ -1,13 +1,14 @@
-import React, { Component } from "react";
-import { MapMarker } from "@primeicons/react/map-marker";
-import { Button } from "@primereact/ui/button";
-import "./../styles.css";
-import Cartao from "./Cartao";
-import Creditos from "./Creditos";
-import Loading from "./Loading";
-import MeuPonto from "./MeuPonto";
-import geoapifyClient from "../utils/geoapifyClient";
-import Busca from "./Busca";
+import React, { Component } from 'react';
+import { MapMarker } from '@primeicons/react/map-marker';
+import './../styles.css';
+import Cartao from './Cartao';
+import Creditos from './Creditos';
+import Loading from './Loading';
+import MeuPonto from './MeuPonto';
+import Busca from './Busca';
+import ListaLugares from './ListaLugares';
+import geoapifyClient from '../utils/geoapifyClient';
+
 
 class App extends Component {
   state = {
@@ -15,6 +16,7 @@ class App extends Component {
     longitude: null,
     horarioLocalizacao: null,
     mensagemDeErro: null,
+    lugares: null
   };
 
   componentDidMount() {
@@ -28,70 +30,87 @@ class App extends Component {
           latitude: posicao.coords.latitude,
           longitude: posicao.coords.longitude,
           horarioLocalizacao: Date.now(),
-          mensagemDeErro: null,
+          mensagemDeErro: null
         });
       },
       (erro) => {
         console.log(erro);
         this.setState({
           mensagemDeErro:
-            "Não foi possível obter sua localização. Libere o acesso no navegador e atualize a página.",
+            'Não foi possível obter sua localização. Libere o acesso no navegador e atualize a página.'
         });
-      },
+      }
     );
   };
 
   onBuscaRealizada = async (categoria, raio) => {
-    const result = await geoapifyClient.get("/places", {
+    const result = await geoapifyClient.get('/places', {
       params: {
         categories: categoria,
         filter: `circle:${this.state.longitude},${this.state.latitude},${raio}`,
         bias: `proximity:${this.state.longitude},${this.state.latitude}`,
-        limit: 20,
-      },
+        limit: 20
+      }
     });
-    console.log(result.data.features);
+    this.setState({ lugares: result.data.features });
   };
 
   estiloSubtitulo = {
-    color: "#666",
-    fontSize: "18px",
-    textAlign: "center",
-    marginTop: "10px",
+    color: '#666',
+    fontSize: '18px',
+    textAlign: 'center',
+    marginTop: '10px'
   };
 
   obterAno = () => new Date().getFullYear();
+
   render() {
     return (
-      <div>
-        <h1 className="titulo">
-          <MapMarker />
-          RolêRadar
-        </h1>
-        <p style={this.estiloSubtitulo}>Descubra o que existe perto de você</p>
-        <Creditos />
-        {this.state.mensagemDeErro ? (
-          <p>{this.state.mensagemDeErro}</p>
-        ) : !this.state.latitude ? (
-          <Loading mensagem="Aguardando permissão de localização..." />
-        ) : (
-          <div>
-            <Cartao cabecalho="Você está aqui">
-              <MeuPonto
-                latitude={this.state.latitude}
-                longitude={this.state.longitude}
-                horarioLocalizacao={this.state.horarioLocalizacao}
-                onAtualizar={this.obterLocalizacao}
-              />
-            </Cartao>
-            <div className="mt-3">
-              <Cartao cabecalho="O que você procura?">
-                <Busca onBuscaRealizada={this.onBuscaRealizada} />
+      <div className="grid">
+        <div className="col-12">
+          <h1 className="titulo">
+            <MapMarker />
+            RolêRadar
+          </h1>
+          <p style={this.estiloSubtitulo}>Descubra o que existe perto de você</p>
+          <Creditos />
+        </div>
+        <div className="col-6">
+          {this.state.mensagemDeErro ? (
+            <p>{this.state.mensagemDeErro}</p>
+          ) : !this.state.latitude ? (
+            <Loading mensagem="Aguardando permissão de localização..." />
+          ) : (
+            <div>
+              <Cartao cabecalho="Você está aqui">
+                <MeuPonto
+                  latitude={this.state.latitude}
+                  longitude={this.state.longitude}
+                  horarioLocalizacao={this.state.horarioLocalizacao}
+                  onAtualizar={this.obterLocalizacao}
+                />
               </Cartao>
+              <div className="mt-3">
+                <Cartao cabecalho="O que você procura?">
+                  <Busca onBuscaRealizada={this.onBuscaRealizada} />
+                </Cartao>
+              </div>
             </div>
-          </div>
-        )}
-        <footer>RolêRadar © {this.obterAno()}</footer>
+          )}
+        </div>
+        <div className="col-6">
+          {
+            !this.state.lugares ?
+              null
+            : this.state.lugares.length < 1 ?
+              <p>Nenhum lugar encontrado. Tente aumentar o raio.</p>
+            :
+              <ListaLugares lugares={this.state.lugares} />
+          }
+        </div>
+        <div className="col-12">
+          <footer>RolêRadar © {this.obterAno()}</footer>
+        </div>
       </div>
     );
   }
