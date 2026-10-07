@@ -1,20 +1,20 @@
-import React, { Component } from 'react';
-import { MapMarker } from '@primeicons/react/map-marker';
-import { Button } from '@primereact/ui/button';
-import './../styles.css';
-import Cartao from './Cartao';
-import Creditos from './Creditos';
-import Loading from './Loading';
-import MeuPonto from './MeuPonto';
-import geoapifyClient from '../utils/geoapifyClient';
-
+import React, { Component } from "react";
+import { MapMarker } from "@primeicons/react/map-marker";
+import { Button } from "@primereact/ui/button";
+import "./../styles.css";
+import Cartao from "./Cartao";
+import Creditos from "./Creditos";
+import Loading from "./Loading";
+import MeuPonto from "./MeuPonto";
+import geoapifyClient from "../utils/geoapifyClient";
+import Busca from "./Busca";
 
 class App extends Component {
   state = {
     latitude: null,
     longitude: null,
     horarioLocalizacao: null,
-    mensagemDeErro: null
+    mensagemDeErro: null,
   };
 
   componentDidMount() {
@@ -28,36 +28,36 @@ class App extends Component {
           latitude: posicao.coords.latitude,
           longitude: posicao.coords.longitude,
           horarioLocalizacao: Date.now(),
-          mensagemDeErro: null
+          mensagemDeErro: null,
         });
       },
       (erro) => {
         console.log(erro);
         this.setState({
           mensagemDeErro:
-            'Não foi possível obter sua localização. Libere o acesso no navegador e atualize a página.'
+            "Não foi possível obter sua localização. Libere o acesso no navegador e atualize a página.",
         });
-      }
+      },
     );
   };
 
   onBuscaRealizada = async (categoria, raio) => {
-    const result = await geoapifyClient.get('/places', {
+    const result = await geoapifyClient.get("/places", {
       params: {
         categories: categoria,
         filter: `circle:${this.state.longitude},${this.state.latitude},${raio}`,
         bias: `proximity:${this.state.longitude},${this.state.latitude}`,
-        limit: 20
-      }
+        limit: 20,
+      },
     });
     console.log(result.data.features);
   };
 
   estiloSubtitulo = {
-    color: '#666',
-    fontSize: '18px',
-    textAlign: 'center',
-    marginTop: '10px'
+    color: "#666",
+    fontSize: "18px",
+    textAlign: "center",
+    marginTop: "10px",
   };
 
   obterAno = () => new Date().getFullYear();
@@ -84,10 +84,11 @@ class App extends Component {
                 onAtualizar={this.obterLocalizacao}
               />
             </Cartao>
-            <Button
-              onClick={() => this.onBuscaRealizada('catering.cafe', 1000)}>
-              Testar busca
-            </Button>
+            <div className="mt-3">
+              <Cartao cabecalho="O que você procura?">
+                <Busca onBuscaRealizada={this.onBuscaRealizada} />
+              </Cartao>
+            </div>
           </div>
         )}
         <footer>RolêRadar © {this.obterAno()}</footer>
