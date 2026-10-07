@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { MapMarker } from '@primeicons/react/map-marker';
+import { Button } from '@primereact/ui/button';
 import './../styles.css';
 import Cartao from './Cartao';
 import Creditos from './Creditos';
 import Loading from './Loading';
 import MeuPonto from './MeuPonto';
+import geoapifyClient from '../utils/geoapifyClient';
 
 
 class App extends Component {
@@ -39,6 +41,18 @@ class App extends Component {
     );
   };
 
+  onBuscaRealizada = async (categoria, raio) => {
+    const result = await geoapifyClient.get('/places', {
+      params: {
+        categories: categoria,
+        filter: `circle:${this.state.longitude},${this.state.latitude},${raio}`,
+        bias: `proximity:${this.state.longitude},${this.state.latitude}`,
+        limit: 20
+      }
+    });
+    console.log(result.data.features);
+  };
+
   estiloSubtitulo = {
     color: '#666',
     fontSize: '18px',
@@ -47,10 +61,9 @@ class App extends Component {
   };
 
   obterAno = () => new Date().getFullYear();
-
   render() {
     return (
-      <>
+      <div>
         <h1 className="titulo">
           <MapMarker />
           RolêRadar
@@ -62,17 +75,23 @@ class App extends Component {
         ) : !this.state.latitude ? (
           <Loading mensagem="Aguardando permissão de localização..." />
         ) : (
-          <Cartao cabecalho="Você está aqui">
-            <MeuPonto
-              latitude={this.state.latitude}
-              longitude={this.state.longitude}
-              horarioLocalizacao={this.state.horarioLocalizacao}
-              onAtualizar={this.obterLocalizacao}
-            />
-          </Cartao>
+          <div>
+            <Cartao cabecalho="Você está aqui">
+              <MeuPonto
+                latitude={this.state.latitude}
+                longitude={this.state.longitude}
+                horarioLocalizacao={this.state.horarioLocalizacao}
+                onAtualizar={this.obterLocalizacao}
+              />
+            </Cartao>
+            <Button
+              onClick={() => this.onBuscaRealizada('catering.cafe', 1000)}>
+              Testar busca
+            </Button>
+          </div>
         )}
         <footer>RolêRadar © {this.obterAno()}</footer>
-      </>
+      </div>
     );
   }
 }
